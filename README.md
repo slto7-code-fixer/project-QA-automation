@@ -35,6 +35,24 @@ python -m playwright install
 pytest -q
 ```
 
+5. لتوليد تقرير HTML سريعًا:
+
+```bash
+pytest --html=report.html -q
+# التقرير: report.html
+```
+
+6. لتجميع نتائج Allure (مخرجات Allure تُخزّن في `allure-results`):
+
+```bash
+pytest --alluredir=allure-results -q
+# لإنشاء تقرير Allure محليًا تحتاج لأداة Allure CLI:
+# https://docs.qameta.io/allure/
+# مثال لتوليد التقرير إن كان مثبتًا:
+allure generate allure-results -o allure-report --clean
+allure open allure-report
+```
+
 ## ملاحظات
 - أضفت `tests/test_example_playwright.py` كمثال على اختبار متصفح باستخدام Playwright.
 - لتركيب Playwright والمتصفحات في بيئة CI تأكد من تشغيل `playwright install` أو استخدم action رسمي في GitHub Actions.
