@@ -34,10 +34,14 @@ jobs:
         run: python -m playwright install
 
       - name: Lint (flake8)
-        run: flake8 || true
+        run: |
+          flake8 | tee flake8-output.txt
+        continue-on-error: true
 
       - name: Type check (mypy)
-        run: mypy . || true
+        run: |
+          mypy . | tee mypy-output.txt
+        continue-on-error: true
 
       - name: Run tests (pytest) with coverage + HTML + Allure
         run: pytest --html=report.html --alluredir=allure-results --cov=. --cov-report=xml -q || true
@@ -54,6 +58,20 @@ jobs:
         with:
           name: pytest-report
           path: report.html
+
+      - name: Upload flake8 output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: flake8-output
+          path: flake8-output.txt
+
+      - name: Upload mypy output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mypy-output
+          path: mypy-output.txt
 
       - name: Upload Allure results
         if: always()
