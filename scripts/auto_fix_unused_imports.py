@@ -14,12 +14,12 @@ commits changes on a new git branch so you can review them before merging.
 
 import os
 import re
-import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
-IMPORT_RE = re.compile(r'^(from\s+([\w\.]+)\s+import\s+(.*)|import\s+(.*))')
+IMPORT_RE = re.compile(
+    r'^(from\s+([\w\.]+)\s+import\s+(.*)|import\s+(.*))' )
 
 
 def analyze_file(path: Path) -> tuple[bool, str]:
@@ -56,7 +56,8 @@ def analyze_file(path: Path) -> tuple[bool, str]:
             names = [p.strip().split(' as ')[-1] for p in raw.split(',')]
             imports.append((i, line, 'import', names))
 
-    body = '\n'.join([l for idx, l in enumerate(lines) if idx not in import_lines_idx])
+    body = '\n'.join([l for idx, l in enumerate(lines)
+                      if idx not in import_lines_idx])
 
     remove_idxs = set()
     for idx, line, itype, names in imports:
@@ -75,19 +76,28 @@ def analyze_file(path: Path) -> tuple[bool, str]:
                 if itype == 'import':
                     new_line = 'import ' + ', '.join(kept)
                 else:
-                    new_line = re.sub(r'import\s+.*$', 'import ' + ', '.join(kept), line)
+                    new_line = re.sub(
+                        r'import\s+.*$',
+                        'import ' + ', '.join(kept),
+                        line,
+                    )
                 lines[idx] = new_line
 
     if not remove_idxs:
         return False, text
 
-    new_lines = [l for i, l in enumerate(lines) if i not in remove_idxs]
-    new_text = '\n'.join(new_lines) + ('\n' if text.endswith('\n') else '')
+    new_lines = [l for i, l in enumerate(lines)
+                 if i not in remove_idxs]
+    new_text = '\n'.join(new_lines) + (
+        '\n' if text.endswith('\n') else '' )
     return True, new_text
 
 
 def main():
-    py_files = [p for p in ROOT.rglob('*.py') if '.venv' not in p.parts and p.is_file()]
+    py_files = [
+        p for p in ROOT.rglob('*.py')
+        if '.venv' not in p.parts and p.is_file()
+    ]
     modified = []
     for p in py_files:
         ok, new_text = analyze_file(p)
@@ -98,7 +108,7 @@ def main():
             modified.append((p, backup))
 
     if not modified:
-        print('No changes made (no clearly-unused top-level imports found).')
+        print('No changes made (no unused imports found).')
         return
 
     print(f'Updated {len(modified)} files:')
@@ -107,14 +117,15 @@ def main():
 
     # Commit changes on a new branch
     branch = 'fix/auto-unused-imports'
-    os.system(f'git checkout -b {branch} >/dev/null 2>&1 || git checkout {branch}')
+    os.system(f'git checkout -b {branch} >/dev/null 2>&1 '
+              f'|| git checkout {branch}')
     os.system('git add -A')
-    msg = 'chore: remove clearly-unused top-level imports (auto-fixed)'
+    msg = 'chore: remove unused imports (auto-fixed)'
     rc = os.system(f'git commit -m "{msg}" || true')
     if rc == 0:
         print('Committed changes.')
     else:
-        print('No commit created (maybe nothing staged).')
+        print('No commit created (nothing staged).')
 
 
 if __name__ == '__main__':
