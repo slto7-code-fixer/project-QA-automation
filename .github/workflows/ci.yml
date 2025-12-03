@@ -44,7 +44,8 @@ jobs:
         continue-on-error: true
 
       - name: Run tests (pytest) with coverage + HTML + Allure
-        run: pytest --html=report.html --alluredir=allure-results --cov=. --cov-report=xml -q || true
+        run: |
+          pytest --html=report.html --alluredir=allure-results --cov=. --cov-report=xml -q || true
 
       - name: Debug outputs (list files)
         run: |
