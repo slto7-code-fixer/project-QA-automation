@@ -19,7 +19,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 IMPORT_RE = re.compile(
-    r'^(from\s+([\w\.]+)\s+import\s+(.*)|import\s+(.*))' )
+    r'^(from\s+([\w\.]+)\s+import\s+(.*)|import\s+(.*))$'
+)
 
 
 def analyze_file(path: Path) -> tuple[bool, str]:
@@ -89,7 +90,8 @@ def analyze_file(path: Path) -> tuple[bool, str]:
     new_lines = [l for i, l in enumerate(lines)
                  if i not in remove_idxs]
     new_text = '\n'.join(new_lines) + (
-        '\n' if text.endswith('\n') else '' )
+        '\n' if text.endswith('\n') else ''
+    )
     return True, new_text
 
 
