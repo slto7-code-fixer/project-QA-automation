@@ -19,12 +19,21 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
+        - name: Lint (flake8)
+          run: |
+            flake8 || true
+        - name: Type check (mypy)
+          run: |
+            mypy . || true
       - name: Install Playwright browsers
         run: |
           python -m playwright install chromium
       - name: Run tests and produce HTML report + Allure results
         run: |
           pytest --html=report.html --alluredir=allure-results -q || true
+        - name: Run tests (pytest) with coverage and produce HTML report + Allure results
+          run: |
+            pytest --html=report.html --alluredir=allure-results --cov=./ --cov-report=xml -q || true
       - name: Upload HTML report
         uses: actions/upload-artifact@v4
         with:
@@ -35,3 +44,8 @@ jobs:
         with:
           name: allure-results
           path: allure-results
+        - name: Upload coverage xml
+          uses: actions/upload-artifact@v4
+          with:
+            name: coverage-xml
+            path: coverage.xml

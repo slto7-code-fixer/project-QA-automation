@@ -3,3 +3,7 @@ playwright
 pytest-html
 allure-pytest
 pytest-xdist
+flake8
+mypy
+pytest-cov
+coverage
